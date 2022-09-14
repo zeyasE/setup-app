@@ -1,0 +1,3 @@
+const responseStructure = () => {
+    return 
+}

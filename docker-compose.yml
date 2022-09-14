@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    depends_on:
+      - app
+      - api
+    restart: always
+    build: ./nginx
+    ports:
+      - "80:80"
+    networks:
+      - backend
+
+  app:
+    build: ./app
+    container_name: app
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./app/.env
+    volumes:
+      - ./app:/usr/src/app
+    networks:
+      - backend
+
+  api:
+    build: ./api
+    container_name: api
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./api/.env
+    volumes:
+      - ./api:/usr/src/app
+    networks:
+      - backend
+
+  database:
+    image: postgres:11-alpine
+    restart: always
+    container_name: local
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: local
+      POSTGRES_PASSWORD: local
+      POSTGRES_DB: local
+    networks:
+      - backend
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+      ADMINER_DESIGN: lucas-sandery
+    networks:
+      - backend
+
+networks:
+  backend:
